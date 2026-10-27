@@ -1,5 +1,6 @@
 ---
 name: traceable-tests
+license: MIT
 description: Traceable 3-layer testing workflow (Test Scenario -> Test Case -> Requirements Traceability Matrix) with 7 mandatory coverage dimensions and fail-first ordering. Use when the user asks to write or derive test cases, design a testing strategy, audit existing test coverage, review test completeness, or mentions TS/TC/RTM.
 ---
 
