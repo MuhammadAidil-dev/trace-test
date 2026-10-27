@@ -1,0 +1,130 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+secrets/
+
+# Dependencies and package-manager caches
+node_modules/
+bower_components/
+.pnp/
+.pnp.*
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.npm/
+.pnpm-store/
+
+# Build output and generated files
+dist/
+build/
+out/
+coverage/
+.next/
+.nuxt/
+.svelte-kit/
+.astro/
+.vercel/
+.netlify/
+.cache/
+.parcel-cache/
+.turbo/
+.vite/
+storybook-static/
+*.tsbuildinfo
+
+# Logs and runtime files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.pid
+*.pid.lock
+*.seed
+
+# Test and tooling artifacts
+.nyc_output/
+playwright-report/
+test-results/
+blob-report/
+.eslintcache
+.stylelintcache
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+htmlcov/
+.coverage
+.coverage.*
+*.egg-info/
+.eggs/
+
+# Java / Kotlin / Gradle
+.gradle/
+target/
+*.class
+
+# Go and Rust
+bin/
+*.test
+*.prof
+Cargo.lock
+
+# PHP / Ruby / .NET
+vendor/
+.bundle/
+Gemfile.lock
+[Bb]in/
+[Oo]bj/
+
+# Editor and IDE files
+.idea/
+.vscode/
+*.suo
+*.user
+*.userossc
+*.sln.docstates
+*.swp
+*.swo
+*~
+
+# Operating-system files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+Desktop.ini
+
+# Temporary files and backups
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+
