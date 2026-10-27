@@ -1,11 +1,16 @@
+---
+name: traceable-tests
+description: Traceable 3-layer testing workflow (Test Scenario -> Test Case -> Requirements Traceability Matrix) with 7 mandatory coverage dimensions and fail-first ordering. Use when the user asks to write or derive test cases, design a testing strategy, audit existing test coverage, review test completeness, or mentions TS/TC/RTM.
+---
+
 # Skill: traceable-tests
 
 **Nama Skill:** `traceable-tests`  
-**Tipe:** Methodology/Process skill (language-agnostic)  
-**Platform:** Cross-platform portable (OpenCode, Claude Code, Codex, dll)  
-**Lokasi install:** `~/.config/opencode/skills/traceable-tests/` atau `~/.agents/skills/traceable-tests/` atau repo-specific `.opencode/skills/traceable-tests/`  
+**Tipe:** Methodology/Process skill (language-agnostic, agent-agnostic)  
+**Platform:** Portable ke semua agent yang mendukung standar Agent Skills  
+**Lokasi sumber:** `skills/traceable-tests/` (satu sumber kebenaran, tanpa salinan per-agent)  
 **Format artefak:** Markdown documentation + test code structure guidance  
-**Versi:** 1.0 (2026-10-26)
+**Versi:** 1.1 (2026-10-27)
 
 ---
 
@@ -179,12 +184,18 @@ docs/testing/
 
 ```
 TEST_SUITE([TS-ID]: [TS-DESCRIPTION]) {
-  
+
   TEST_CASE([TC-ID]: [CONDITION] - [EXPECTED_RESULT]) {
     // Arrange (kondisi awal + setup)
     // Act (action/execution)
     // Assert (verify expected result)
   }
+
+  TEST_CASE([TC-ID]: [CONDITION] - [EXPECTED_RESULT]) {
+    // implementation
+  }
+}
+```
 
 **Contoh - Jest/Vitest:**
 
@@ -325,11 +336,6 @@ TC-PRODUCT-10: Ambil list produk - 200, return list produk
 - ✓ Unauthorized: TC-07
 - ✓ Forbidden: TC-08
 - ✓ Happy path: TC-09, TC-10
-  
-  TEST_CASE([TC-ID]: [CONDITION] - [EXPECTED_RESULT]) {
-    // implementation
-  }
-}
 
 ---
 
@@ -540,22 +546,40 @@ Agent harus adaptasi pseudo-code ke target framework:
 
 ---
 
-## 13. Installation & Portability
+## 13. Distribution & Installation
 
-**Installation paths (per platform):**
+**Sumber tunggal:** seluruh isi skill berada di `skills/traceable-tests/`. Repo ini tidak menyimpan salinan per-agent; installer CLI yang membuat link atau salinan ke direktori skill milik agent yang dipilih.
 
-| Platform | Global path | Repo-specific path |
-|----------|-------------|-------------------|
-| OpenCode | `~/.config/opencode/skills/traceable-tests/` | `.opencode/skills/traceable-tests/` |
-| Claude Code | `~/.claude/skills/traceable-tests/` | `.claude/skills/traceable-tests/` |
-| Codex | `~/.codex/skills/traceable-tests/` | `.codex/skills/traceable-tests/` |
-| Generic agents | `~/.agents/skills/traceable-tests/` | `.agents/skills/traceable-tests/` |
+**Frontmatter wajib:** `SKILL.md` memakai YAML frontmatter standar Agent Skills (`name`, `description`). `description` harus menyebut apa yang dikerjakan skill dan kapan dipakai, karena itulah yang dibaca agent untuk memutuskan apakah skill ini relevan.
 
-**Cross-agent compatibility:**
-- Pure markdown skill definition (tanpa platform-specific code)
-- Framework-agnostic principles dengan adaptation guidance
-- Template files menggunakan placeholders, bukan hardcoded syntax
-- Skill terpasang di salah satu lokasi di atas akan bekerja sama di semua platform karena konten berupa markdown murni
+**Instalasi (satu perintah):**
+
+```bash
+# Interaktif: pilih skill & agent tujuan
+npx skills add MuhammadAidil-dev/trace-test --skill traceable-tests
+
+# Non-interaktif ke semua agent yang terdeteksi
+npx skills add MuhammadAidil-dev/trace-test --skill traceable-tests --all
+
+# Global (tersedia di semua project) untuk agent tertentu
+npx skills add MuhammadAidil-dev/trace-test --skill traceable-tests -g -a claude-code -a codex -a opencode
+
+# Dari checkout lokal (mis. sebelum repo dipublikasikan)
+npx skills add ./skills/traceable-tests
+```
+
+Tanpa instalasi, skill bisa dipakai sekali jalan:
+
+```bash
+npx skills use MuhammadAidil-dev/trace-test@traceable-tests
+```
+
+**Mode pemasangan:** symlink (rekomendasi — satu sumber kebenaran dan mudah di-update) atau copy (untuk lingkungan tanpa dukungan symlink).
+
+**Kompatibilitas lintas agent:**
+- Definisi markdown murni + frontmatter standar Agent Skills, tanpa kode spesifik platform
+- Prinsip framework-agnostic dengan panduan adaptasi (§12); template memakai placeholder, bukan sintaks hardcoded
+- Nama skill dan struktur direktori identik di semua agent; isi tidak berubah per platform
 
 ---
 
@@ -568,7 +592,7 @@ Skill berhasil jika:
 3. **Traceability:** Clear mapping from requirements → TS → TC → test code
 4. **Fail-first:** Test code consistently orders negative cases before happy path
 5. **Audit mode:** Gap detection correctly identifies missing coverage dimensions
-6. **Portability:** Skill works across OpenCode, Claude Code, Codex without modification
+6. **Portability:** Skill runs unmodified on any agent that supports the Agent Skills standard
 7. **User validation:** Gates ensure user approval before artifact generation
 
 ### Quality Metrics
