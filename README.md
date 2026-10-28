@@ -15,7 +15,7 @@ Test Scenario → Test Case → Requirements Traceability Matrix
 
 ## Daftar Isi
 
-[Ikhtisar](#ikhtisar) · [Fitur](#fitur) · [Quick Start](#quick-start) · [Cara Kerja](#cara-kerja) · [Contoh Keluaran](#contoh-keluaran) · [Kompatibilitas](#kompatibilitas) · [Struktur Repo](#struktur-repo) · [Batasan](#batasan) · [FAQ](#faq) · [Kontribusi](#kontribusi) · [Lisensi](#lisensi) · [Referensi](#referensi)
+[Ikhtisar](#ikhtisar) · [Fitur](#fitur) · [Quick Start](#quick-start) · [Troubleshooting](#troubleshooting) · [Cara Kerja](#cara-kerja) · [Contoh Keluaran](#contoh-keluaran) · [Kompatibilitas](#kompatibilitas) · [Struktur Repo](#struktur-repo) · [Batasan](#batasan) · [FAQ](#faq) · [Kontribusi](#kontribusi) · [Lisensi](#lisensi) · [Referensi](#referensi)
 
 ## Ikhtisar
 
@@ -40,11 +40,16 @@ Semua isi repo berupa markdown: tidak ada kode yang dijalankan, tidak ada depend
 
 ## Quick Start
 
+Pasang ke **semua agent yang terdeteksi** dengan satu perintah:
+
 ```bash
-npx skills add MuhammadAidil-dev/trace-test --skill traceable-tests
+npx skills add MuhammadAidil-dev/trace-test --skill traceable-tests -g --all
 ```
 
-Setelah terpasang, cukup bicara natural ke agent-mu:
+> [!IMPORTANT]
+> Skill hanya terpasang ke agent yang **dipilih saat instalasi**. Tanpa `--all` atau `-a <agent>`, CLI bisa memasang ke `~/.agents/skills/` saja — folder yang dibaca OpenCode, Codex, Cursor, dan Copilot — sedangkan **Claude Code membaca `~/.claude/skills/`**. Jika skill tidak muncul di Claude Code, lihat [Troubleshooting](#troubleshooting).
+
+Setelah terpasang, **restart sesi agent**, lalu bicara natural:
 
 ```
 buatkan test case untuk fitur login
@@ -62,29 +67,50 @@ Agent juga mengenali penyebutan **TS**, **TC**, atau **RTM** secara eksplisit. J
 
 ### Opsi Instalasi
 
+| Kebutuhan | Perintah |
+|---|---|
+| Semua agent terdeteksi, global | `npx skills add MuhammadAidil-dev/trace-test --skill traceable-tests -g --all` |
+| Agent tertentu, global | `npx skills add MuhammadAidil-dev/trace-test --skill traceable-tests -g -a claude-code -a opencode` |
+| Hanya project saat ini | `npx skills add MuhammadAidil-dev/trace-test --skill traceable-tests -a claude-code` |
+| Pilih interaktif | `npx skills add MuhammadAidil-dev/trace-test --skill traceable-tests` |
+| Dari checkout lokal | `npx skills add ./skills/traceable-tests -g -a claude-code` |
+| Tanpa instalasi (sekali jalan) | `npx skills use MuhammadAidil-dev/trace-test@traceable-tests` |
+
+- `-g` memasang global (semua project); tanpa `-g` hanya untuk project saat ini.
+- `-a` bisa diulang untuk beberapa agent. Daftar nama agent ada di [Kompatibilitas](#kompatibilitas).
+- Di mode interaktif, **centang Claude Code secara eksplisit** — ia tidak otomatis terpilih.
+
+**Instalasi manual**: salin folder `skills/traceable-tests/` ke direktori skill agent tujuan (lihat tabel [Kompatibilitas](#kompatibilitas)).
+
+### Cara CLI Memasang
+
+CLI menyimpan satu salinan kanonis di `.agents/skills/traceable-tests/`, lalu menautkannya ke direktori milik agent yang dipilih — lewat symlink, atau copy bila lingkunganmu tidak mendukung symlink (mis. Windows tanpa symlink privilege). Agent yang tidak dipilih tidak mendapat tautan.
+
+### Verifikasi Instalasi
+
 ```bash
-# Pilih skill & agent tujuan secara interaktif
-npx skills add MuhammadAidil-dev/trace-test --skill traceable-tests
-
-# Non-interaktif ke semua agent yang terdeteksi
-npx skills add MuhammadAidil-dev/trace-test --skill traceable-tests --all
-
-# Global (tersedia di semua project) untuk agent tertentu
-npx skills add MuhammadAidil-dev/trace-test --skill traceable-tests -g -a claude-code -a codex -a opencode
-
-# Dari checkout lokal
-npx skills add ./skills/traceable-tests
+# Linux / macOS / Git Bash
+ls ~/.claude/skills/traceable-tests/SKILL.md   # Claude Code
+ls ~/.agents/skills/traceable-tests/SKILL.md   # OpenCode, Codex, Cursor, dll.
 ```
 
-**Tanpa instalasi**, pakai sekali jalan:
-
-```bash
-npx skills use MuhammadAidil-dev/trace-test@traceable-tests
+```powershell
+# Windows PowerShell
+Test-Path "$HOME\.claude\skills\traceable-tests\SKILL.md"
+Test-Path "$HOME\.agents\skills\traceable-tests\SKILL.md"
 ```
 
-**Instalasi manual**: salin `skills/traceable-tests/` ke direktori skill agent tujuan, mis. `.agents/skills/traceable-tests/` (project) atau `~/.agents/skills/traceable-tests/` (global).
+Hasil `True`/file ada berarti terpasang. Agent memuat daftar skill saat sesi dimulai, jadi **restart sesi** setelah instalasi.
 
-CLI memasang ke direktori milik masing-masing agent — `.agents/skills/` untuk OpenCode, Codex, Cursor, dan Copilot, atau `.claude/skills/` untuk Claude Code — memakai symlink ke satu sumber di `skills/traceable-tests/` (atau copy, bila lingkunganmu tidak mendukung symlink, seperti Windows tanpa symlink privilege).
+## Troubleshooting
+
+| Gejala | Penyebab | Solusi |
+|---|---|---|
+| Terpasang di OpenCode/Codex/Cursor, **tidak muncul di Claude Code** | Instalasi hanya menulis ke `~/.agents/skills/`; Claude Code membaca `~/.claude/skills/` | Jalankan ulang dengan `-a claude-code` (atau `--all`), lalu restart sesi |
+| Skill ada di folder tetapi agent tidak melihatnya | Sesi belum dimuat ulang | Restart sesi agent |
+| Folder ada tetapi skill tidak terdeteksi | Frontmatter `SKILL.md` rusak atau `name` tidak sama dengan nama folder | Jalankan `npx skills add . --list`; harus menemukan 1 skill: `traceable-tests` |
+| Symlink gagal di Windows | Tidak ada symlink privilege | Normal — CLI otomatis memakai copy. Jalankan ulang perintah instalasi untuk memperbarui salinan |
+| `npx skills` error versi | Node.js lebih lama dari 22.20 | Perbarui Node.js |
 
 ## Cara Kerja
 
@@ -207,14 +233,16 @@ Contoh lengkap ada di [`skills/traceable-tests/examples/`](skills/traceable-test
 
 Skill mengikuti [spesifikasi Agent Skills](https://agentskills.io), jadi formatnya sama di semua agent pendukung. Beberapa contoh flag `--agent`:
 
-| Agent | Flag | Direktori project |
-|---|---|---|
-| Claude Code | `claude-code` | `.claude/skills/` |
-| OpenCode | `opencode` | `.agents/skills/` |
-| Codex | `codex` | `.agents/skills/` |
-| Cursor | `cursor` | `.agents/skills/` |
-| GitHub Copilot | `github-copilot` | `.agents/skills/` |
-| Gemini CLI | `gemini-cli` | `.agents/skills/` |
+| Agent | Flag `-a` | Direktori project | Direktori global (`-g`) |
+|---|---|---|---|
+| Claude Code | `claude-code` | `.claude/skills/` | `~/.claude/skills/` |
+| OpenCode | `opencode` | `.agents/skills/` | `~/.agents/skills/` |
+| Codex | `codex` | `.agents/skills/` | `~/.agents/skills/` |
+| Cursor | `cursor` | `.agents/skills/` | `~/.agents/skills/` |
+| GitHub Copilot | `github-copilot` | `.agents/skills/` | `~/.agents/skills/` |
+| Gemini CLI | `gemini-cli` | `.agents/skills/` | `~/.agents/skills/` |
+
+Agent yang berbagi `.agents/skills/` otomatis ikut terpasang bersamaan; **Claude Code memakai direktori sendiri** sehingga perlu dipilih eksplisit.
 
 > **Prinsip tetap sama di semua agent:** skill memberi struktur dan prinsip, agent menyesuaikannya ke stack-mu — bukan mengikatmu ke framework atau vendor agent tertentu.
 
@@ -247,6 +275,13 @@ Skill ini sengaja dibatasi pada perancangan, pendokumentasian, dan pengauditan t
 | Detail alur otomasi E2E UI | Di luar cakupan |
 
 ## FAQ
+
+<details>
+<summary><b>Kenapa skill terpasang di OpenCode tetapi tidak di Claude Code?</b></summary>
+
+OpenCode membaca `~/.agents/skills/`, Claude Code membaca `~/.claude/skills/`. CLI hanya menautkan ke agent yang dipilih. Pasang ulang dengan `-a claude-code` atau `--all`, lalu restart sesi. Detail di [Troubleshooting](#troubleshooting).
+
+</details>
 
 <details>
 <summary><b>Apakah skill ini menjalankan test saya?</b></summary>
